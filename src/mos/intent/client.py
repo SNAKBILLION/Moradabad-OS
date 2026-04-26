@@ -52,7 +52,7 @@ class GroqClient:
         self,
         *,
         api_key: str,
-        model: str = "llama-3.3-70b-versatile",
+        model: str = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant"),
         endpoint: str = _DEFAULT_ENDPOINT,
         timeout_seconds: float = _DEFAULT_TIMEOUT_SECONDS,
         http_client: httpx.Client | None = None,
