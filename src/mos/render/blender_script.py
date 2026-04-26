@@ -187,25 +187,39 @@ def _setup_lighting(bpy):
 
 def _configure_render(bpy, args: argparse.Namespace) -> None:
     scene = bpy.context.scene
-    scene.render.engine = args.engine
+
+    # SAFE ENGINE DETECTION
+    try:
+        available = {e.identifier for e in scene.bl_rna.properties["engine"].enum_items}
+    except Exception:
+        available = {"CYCLES", "BLENDER_EEVEE"}
+
+    requested = args.engine
+
+    if requested in available:
+        engine = requested
+    elif "BLENDER_EEVEE" in available:
+        engine = "BLENDER_EEVEE"
+    else:
+        engine = "CYCLES"
+
+    scene.render.engine = engine
+
     scene.render.resolution_x = args.width
     scene.render.resolution_y = args.height
     scene.render.resolution_percentage = 100
     scene.render.image_settings.file_format = "PNG"
     scene.render.image_settings.color_mode = "RGBA"
     scene.render.filepath = str(args.out)
-    if args.engine == "CYCLES":
+
+    if engine == "CYCLES":
         scene.cycles.samples = args.samples
         scene.cycles.use_denoising = True
         scene.cycles.seed = args.seed
-        # CPU rendering — GPU detection is host-specific and we do not want
-        # the test/output to differ silently based on whether a GPU is found.
         scene.cycles.device = "CPU"
     else:
-        # Eevee: samples is taps, lower is fine. Determinism is the point.
         if hasattr(scene, "eevee"):
             scene.eevee.taa_render_samples = args.samples
-
 
 def main() -> int:
     args = _parse(_split_argv())
