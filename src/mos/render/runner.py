@@ -129,12 +129,15 @@ def render_stl(
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
+    # 🔥 FIX: run blender via virtual display
+    cmd = ["xvfb-run", "-a"] + cmd
+
     result = subprocess.run(
-        cmd,
-        capture_output=True,
-        text=True,
-        timeout=opts.timeout_seconds,
-        check=False,
+    cmd,
+    capture_output=True,
+    text=True,
+    timeout=opts.timeout_seconds,
+    check=False,
     )
     if result.returncode != 0:
         raise BlenderRenderError(
