@@ -82,7 +82,7 @@ class TestRenderEndToEnd:
             options=RenderOptions(
                 samples=8,
                 seed=0,
-                engine="BLENDER_EEVEE_NEXT",
+                engine="BLENDER_EEVEE"
                 width=256,
                 height=256,
                 timeout_seconds=120.0,
@@ -103,7 +103,7 @@ class TestRenderEndToEnd:
             out_png,
             options=RenderOptions(
                 samples=4,
-                engine="BLENDER_EEVEE_NEXT",
+                engine="BLENDER_EEVEE"
                 width=320,
                 height=240,
                 timeout_seconds=120.0,
