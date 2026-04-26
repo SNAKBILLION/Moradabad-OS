@@ -71,28 +71,34 @@ def _clear_scene(bpy) -> None:
 
 
 def _import_stl(bpy, stl_path: Path):
-    """Import the STL and return the imported mesh object.
-
-    Blender 4.x exposes STL import via the IO operator; the exact name
-    differs across point releases, so we try the modern path first and
-    fall back to the legacy operator if needed.
-    """
     if not stl_path.exists():
         raise FileNotFoundError(f"STL not found: {stl_path}")
+
+    import addon_utils
+
+    # Ensure STL addon is enabled
+    addon_utils.enable("io_mesh_stl")
+
     before = set(bpy.data.objects)
-    if hasattr(bpy.ops.wm, "stl_import"):
-        bpy.ops.wm.stl_import(filepath=str(stl_path))
-    else:
+
+    try:
+    bpy.ops.wm.stl_import(filepath=str(stl_path))
+    except Exception:
+    try:
         bpy.ops.import_mesh.stl(filepath=str(stl_path))
+    except Exception:
+        raise RuntimeError("No STL import operator available")
     new = [o for o in bpy.data.objects if o not in before]
     if not new:
         raise RuntimeError("STL import produced no objects")
+
     obj = new[0]
-    # Center on origin; STLs from CadQuery are in mm and may sit far from 0.
+
     bpy.context.view_layer.objects.active = obj
     obj.select_set(True)
     bpy.ops.object.origin_set(type="ORIGIN_GEOMETRY", center="BOUNDS")
     obj.location = (0.0, 0.0, 0.0)
+
     return obj
 
 
