@@ -86,6 +86,7 @@ class GroqClient:
         plus the full response body for auditing. Callers do the JSON parsing
         and schema validation themselves.
         """
+        print("🔥 USING MODEL:", self._model)
         body = {
             "model": self._model,
             "temperature": temperature,
