@@ -1,0 +1,32 @@
+# DFM (Design For Manufacturability) rules.
+#
+# These thresholds are applied by mos.cad.dfm against the built geometry and
+# the template's declared properties.
+#
+# Values below are placeholders based on published foundry norms for brass
+# sand casting. The factory partner calibrates these in week one of the
+# validation phase and bumps the `version` string when they do.
+
+version: "0.1.0-placeholder"
+
+sand_casting:
+  brass:
+    # Min wall thickness the foundry will reliably cast. Template authors
+    # must declare declared_min_wall_mm >= this value.
+    min_wall_mm: 3.0
+
+    # Min draft angle the foundry requires to release the pattern. Template
+    # authors must declare declared_min_draft_deg >= this value.
+    min_draft_deg: 1.5
+
+    # Hard geometry limits measured from the built solid.
+    max_bounding_box_mm:
+      x: 400.0
+      y: 400.0
+      z: 400.0
+    max_mass_g: 5000.0
+
+    # Linear shrinkage applied at export time: finished part = pattern / (1 + s)
+    # Equivalently, pattern = finished * (1 + s). Phase 1 builds the finished
+    # geometry; the runner scales up to pattern size on export.
+    shrinkage_linear: 0.015  # 1.5% for brass

@@ -1,0 +1,46 @@
+# Labor, overhead, and margin rates for the cost engine.
+#
+# All rates are INR. These are PLACEHOLDER values based on typical Moradabad
+# brass-industry conventions; the factory partner replaces them in week one
+# of calibration and bumps the `version` string.
+#
+# Conventions (also documented in each cost sheet's `assumptions`):
+#   casting_labor  -> ₹/kg of RAW (poured) weight
+#   other labor    -> ₹/piece (flat)
+#   plating        -> ₹/piece, only charged when finish.plating != "none"
+#   lacquer        -> ₹/piece, only charged when finish.lacquer == true
+#   overhead_pct   -> applied to (material + labor + finishing) subtotal
+#   margin_pct     -> applied to (subtotal + overhead) — i.e. stacked, not parallel
+
+version: "0.1.0-placeholder"
+
+# Casting yield: finished_weight / raw_weight. 75% is mid-range for brass
+# sand casting; individual templates may override via future metadata.
+default_yield_pct: 75.0
+
+material:
+  # Metal rate source is pluggable; the engine takes it as an input. This
+  # file does not hold metal rates — they live in the metal_rates table.
+
+  # Additional processing losses on top of casting yield (e.g. scaling lost
+  # during polishing). Applied AFTER yield. 0.02 = 2% extra material lost.
+  finishing_loss_pct: 2.0
+
+labor:
+  casting_per_kg_raw_inr: 120.0
+  scraping_per_piece_inr: 25.0
+  chasing_per_piece_inr: 60.0
+  polishing_per_piece_inr: 30.0
+
+finishing:
+  lacquer_per_piece_inr: 15.0
+  plating_per_piece_inr:
+    nickel: 40.0
+    silver: 120.0
+    gold: 250.0
+  # "none" plating is not charged.
+
+packing_per_piece_inr: 20.0
+
+overhead_pct: 15.0
+margin_pct: 25.0
