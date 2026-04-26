@@ -146,8 +146,8 @@ class TestPipelineEndToEnd:
         zip_bytes = store.get_bytes(final.artifacts.bundle_zip_uri)
         with zipfile.ZipFile(BytesIO(zip_bytes)) as zf:
             names = set(zf.namelist())
-        assert "step.step" in names
-        assert "stl.stl" in names
+        assert "step" in names
+        assert "stl" in names
         assert "cost_sheet.json" in names
 
     def test_api_post_then_get(self, session_factory):
