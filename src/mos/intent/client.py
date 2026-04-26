@@ -16,6 +16,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 import httpx
+import os
 
 _DEFAULT_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions"
 _DEFAULT_TIMEOUT_SECONDS = 60.0
@@ -51,7 +52,7 @@ class GroqClient:
         self,
         *,
         api_key: str,
-        model: str = "llama-3.1-70b-versatile",
+        model: str = "llama-3.3-70b-versatile",
         endpoint: str = _DEFAULT_ENDPOINT,
         timeout_seconds: float = _DEFAULT_TIMEOUT_SECONDS,
         http_client: httpx.Client | None = None,
