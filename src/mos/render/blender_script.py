@@ -230,8 +230,18 @@ def main() -> int:
     import bpy  # imported here so non-Blender callers can import this module
 
     _clear_scene(bpy)
+
+    # STL files are exported in millimeters by run_cad. Blender's default
+    # is meters, which makes a 100mm part look 100m wide and pushes the
+    # camera outside the clip range. Switch the scene to millimeters so
+    # camera framing math works on the actual part dimensions.
+    bpy.context.scene.unit_settings.system = "METRIC"
+    bpy.context.scene.unit_settings.length_unit = "MILLIMETERS"
+    bpy.context.scene.unit_settings.scale_length = 0.001
+
     obj = _import_stl(bpy, args.stl)
     mat = _make_brass_material(bpy)
+
     if obj.data.materials:
         obj.data.materials[0] = mat
     else:
