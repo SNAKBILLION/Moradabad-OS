@@ -44,9 +44,9 @@ Engine = Literal["CYCLES", "BLENDER_EEVEE_NEXT", "BLENDER_EEVEE"]
 
 @dataclass(frozen=True)
 class RenderOptions:
-    samples: int = 64
+    samples: int = 32
     seed: int = 0
-    engine: Engine = "CYCLES"
+    engine: Engine = "BLENDER_EEVEE_NEXT"
     width: int = 1024
     height: int = 1024
     timeout_seconds: float = 300.0
