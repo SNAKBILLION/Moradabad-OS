@@ -154,7 +154,9 @@ class TestPipelineEndToEnd:
         """Full API round trip using TestClient. Pipeline runs synchronously
         via the enqueue override."""
         app = create_app()
-
+        from mos.api.app import verify_key
+        app.dependency_overrides[verify_key] = lambda: None
+           
         store = InMemoryObjectStore()
         ran_jobs: list[str] = []
 
