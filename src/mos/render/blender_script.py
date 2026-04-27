@@ -59,15 +59,18 @@ def _clear_scene(bpy) -> None:
     """Wipe the default scene so we start from a known state."""
     bpy.ops.object.select_all(action="SELECT")
     bpy.ops.object.delete(use_global=False)
-    # Also clear orphan data so repeated calls in the same Blender process
-    # (which we don't do today, but might in future for batch renders) start
-    # fresh.
     for collection in (
         bpy.data.meshes, bpy.data.materials, bpy.data.lights,
         bpy.data.cameras, bpy.data.images,
     ):
         for item in list(collection):
             collection.remove(item)
+    # Belt and braces: confirm scene is empty before STL import.
+    # If anything survives (e.g. default cube), STL import will append to
+    # a non-empty scene and the render will show the wrong thing.
+    if len(bpy.data.objects) != 0:
+        leftover = [o.name for o in bpy.data.objects]
+        raise RuntimeError(f"scene clear left objects behind: {leftover}")
 
 
 def _import_stl(bpy, stl_path: Path):
