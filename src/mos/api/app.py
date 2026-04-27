@@ -15,10 +15,13 @@ doesn't invalidate stored job records.
 
 from __future__ import annotations
 
+import hmac
+import os
 from datetime import datetime
 from uuid import UUID, uuid4
 
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.security import APIKeyHeader
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -51,6 +54,26 @@ from mos.schemas import (
 )
 from mos.storage import S3ObjectStore
 from mos.templates import default_registry
+
+
+# --- API key auth -------------------------------------------------------
+#
+# Single shared key, read from MOS_API_KEY env var. Falls back to the
+# pilot literal if the env is unset. Override the env on any non-local
+# deploy. /healthz remains open so load balancers and monitoring can
+# reach it without credentials.
+
+_API_KEY = os.environ.get("MOS_API_KEY", "moradabad-secret-123")
+
+api_key_header = APIKeyHeader(name="x-api-key", auto_error=False)
+
+
+def verify_key(api_key: str | None = Depends(api_key_header)) -> None:
+    """Reject the request unless x-api-key matches the configured key."""
+    if api_key is None:
+        raise HTTPException(status_code=401, detail="missing x-api-key header")
+    if not hmac.compare_digest(api_key, _API_KEY):
+        raise HTTPException(status_code=401, detail="invalid x-api-key")
 
 
 # --- Dependency wiring --------------------------------------------------
@@ -203,6 +226,7 @@ def create_app() -> FastAPI:
         factory: sessionmaker[Session] = Depends(get_session_factory),
         store=Depends(get_store),
         intent_client=Depends(get_intent_client),
+        _: None = Depends(verify_key),
     ) -> JobResponse:
         briefs = BriefRepository(factory)
         specs = DesignSpecRepository(factory)
@@ -312,6 +336,7 @@ def create_app() -> FastAPI:
         job_id: UUID,
         factory: sessionmaker[Session] = Depends(get_session_factory),
         store=Depends(get_store),
+        _: None = Depends(verify_key),
     ) -> JobResponse:
         jobs = JobRepository(factory)
         try:
@@ -331,6 +356,7 @@ def create_app() -> FastAPI:
         job_id: UUID,
         req: FeedbackCreateRequest,
         factory: sessionmaker[Session] = Depends(get_session_factory),
+        _: None = Depends(verify_key),
     ) -> FeedbackResponse:
         # Verify the job exists before recording feedback. The DB FK will
         # also reject orphans (RESTRICT), but a 404 here is clearer than a
@@ -358,6 +384,7 @@ def create_app() -> FastAPI:
         job_id: UUID,
         limit: int = 100,
         factory: sessionmaker[Session] = Depends(get_session_factory),
+        _: None = Depends(verify_key),
     ) -> list[FeedbackResponse]:
         # No 404 if the job has no feedback yet — empty list is the right
         # answer. We only return 422 on bad limit values.
@@ -375,6 +402,7 @@ def create_app() -> FastAPI:
     def get_feedback(
         feedback_id: UUID,
         factory: sessionmaker[Session] = Depends(get_session_factory),
+        _: None = Depends(verify_key),
     ) -> FeedbackResponse:
         try:
             record = FeedbackRepository(factory).get(feedback_id)
