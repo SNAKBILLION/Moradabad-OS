@@ -99,17 +99,31 @@ def _import_stl(bpy, stl_path: Path):
                 f"No STL import operator available: {e}"
             ) from e
 
-    new = [o for o in bpy.data.objects if o not in before]
-    if not new:
-        raise RuntimeError("STL import produced no objects")
+  new = [o for o in bpy.data.objects if o not in before]
+if not new:
+    raise RuntimeError("STL import produced no objects")
 
-    obj = new[0]
-    bpy.context.view_layer.objects.active = obj
-    obj.select_set(True)
-    bpy.ops.object.origin_set(type="ORIGIN_GEOMETRY", center="BOUNDS")
-    obj.location = (0.0, 0.0, 0.0)
+obj = new[0]
 
-    return obj
+# Confirm import actually produced a mesh with geometry. An empty mesh
+# (zero vertices) renders as nothing or as the previous scene's leftover —
+# both produce the "blank/cube" symptom we are debugging.
+if obj.type != "MESH":
+    raise RuntimeError(
+        f"STL import produced non-mesh object: type={obj.type}"
+    )
+if len(obj.data.vertices) == 0:
+    raise RuntimeError(
+        f"STL import produced empty mesh (zero vertices) "
+        f"from {stl_path}"
+    )
+
+bpy.context.view_layer.objects.active = obj
+obj.select_set(True)
+bpy.ops.object.origin_set(type="ORIGIN_GEOMETRY", center="BOUNDS")
+obj.location = (0.0, 0.0, 0.0)
+
+return obj
 
 def _make_brass_material(bpy):
     """Return a Principled BSDF material approximating polished brass.
