@@ -87,6 +87,9 @@ def _pipeline_config() -> PipelineConfig:
 class TestBriefOnlyJob:
     def test_post_with_brief_runs_intent_then_pipeline(self, session_factory):
         app = create_app()
+        from mos.api.app import verify_key
+        app.dependency_overrides[verify_key] = 
+        lambda: None
         store = InMemoryObjectStore()
 
         # Override deps: real DB factory, in-memory store, fake intent client,
@@ -141,6 +144,9 @@ class TestBriefOnlyJob:
         self, session_factory
     ):
         app = create_app()
+        from mos.api.app import verify_key
+        app.dependency_overrides[verify_key] = 
+        lambda: None
         store = InMemoryObjectStore()
 
         # Fake client returns garbage every time -> intent gives up, job
