@@ -124,6 +124,8 @@ def _import_stl(bpy, stl_path: Path):
     obj.location = (0.0, 0.0, 0.0)
 
     return obj
+
+
 def _make_brass_material(bpy):
     """Return a Principled BSDF material approximating polished brass.
 
@@ -173,6 +175,8 @@ def _setup_camera(bpy, target):
         0.0,
         math.radians(45),
     )
+
+
 def _setup_lighting(bpy):
     """Three-point-ish lighting. Same lights every render so reproducibility
     of the test golden image is preserved."""
@@ -239,6 +243,7 @@ def _configure_render(bpy, args: argparse.Namespace) -> None:
     else:
         if hasattr(scene, "eevee"):
             scene.eevee.taa_render_samples = args.samples
+            
 
 def main() -> int:
     args = _parse(_split_argv())
