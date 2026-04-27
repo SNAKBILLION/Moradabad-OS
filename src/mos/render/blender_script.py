@@ -142,26 +142,31 @@ def _make_brass_material(bpy):
 
 
 def _setup_camera(bpy, target):
-    """Place a camera looking at the target's bounding-box center."""
+    """Place a camera looking at the target's bounding-box center.
+
+    Uses obj.bound_box (8 corners in local space) and the object's
+    world matrix to compute a world-space size. Faster and more
+    predictable than iterating vertices.
+    """
+    from mathutils import Vector  # Blender-bundled
+
     cam_data = bpy.data.cameras.new("Cam")
     cam_obj = bpy.data.objects.new("Cam", cam_data)
     bpy.context.collection.objects.link(cam_obj)
     bpy.context.scene.camera = cam_obj
 
-    # Distance keyed off the object's bbox so we frame any size sensibly.
-    bb = [target.matrix_world @ v.co for v in target.data.vertices]
-    if not bb:
-        # Mesh has no vertices — fall back to a default radius
-        radius = 0.1
-    else:
-        xs = [p.x for p in bb]; ys = [p.y for p in bb]; zs = [p.z for p in bb]
-        # Bbox half-diagonal as a robust size scalar.
-        radius = 0.5 * math.sqrt(
-            (max(xs) - min(xs)) ** 2
-            + (max(ys) - min(ys)) ** 2
-            + (max(zs) - min(zs)) ** 2
-        )
-        radius = max(radius, 1e-3)
+    corners_world = [
+        target.matrix_world @ Vector(corner) for corner in target.bound_box
+    ]
+    xs = [p.x for p in corners_world]
+    ys = [p.y for p in corners_world]
+    zs = [p.z for p in corners_world]
+    size = max(
+        max(xs) - min(xs),
+        max(ys) - min(ys),
+        max(zs) - min(zs),
+    )
+    radius = max(size * 0.6, 1e-3)
 
     cam_obj.location = (radius * 2.5, -radius * 2.5, radius * 1.5)
     cam_obj.rotation_euler = (
@@ -169,8 +174,6 @@ def _setup_camera(bpy, target):
         0.0,
         math.radians(45),
     )
-
-
 def _setup_lighting(bpy):
     """Three-point-ish lighting. Same lights every render so reproducibility
     of the test golden image is preserved."""
