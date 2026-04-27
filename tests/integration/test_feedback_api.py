@@ -80,8 +80,7 @@ def client(session_factory):
     that won't be called."""
     app = create_app()
     from mos.api.app import verify_key
-    app.dependency_overrides[verify_key] = 
-    lambda: None
+    app.dependency_overrides[verify_key] = lambda: None
     app.dependency_overrides[get_session_factory] = lambda: session_factory
     app.dependency_overrides[get_store] = lambda: InMemoryObjectStore()
     try:
