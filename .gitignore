@@ -1,0 +1,6 @@
+src/mos/api/app.py.bak
+
+# Python cache and backups (added during M9 debugging)
+**/__pycache__/
+*.bak
+*.py.bak

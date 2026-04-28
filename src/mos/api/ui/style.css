@@ -1,0 +1,28 @@
+* { box-sizing: border-box; }
+body { font-family: system-ui, -apple-system, sans-serif; max-width: 900px; margin: 24px auto; padding: 0 16px; color: #111; background: #fafafa; }
+header h1 { margin-bottom: 4px; }
+.sub { color: #666; margin-top: 0; }
+.card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+h2 { margin-top: 0; font-size: 16px; color: #333; }
+label { display: block; margin: 8px 0; font-size: 13px; color: #444; }
+input, textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-family: monospace; font-size: 13px; }
+textarea { resize: vertical; }
+button { background: #0a5; color: #fff; border: 0; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 8px; font-size: 14px; }
+button:hover { background: #084; }
+button:disabled { background: #999; cursor: not-allowed; }
+.msg { margin-top: 8px; font-size: 13px; padding: 8px; border-radius: 4px; min-height: 20px; }
+.msg.ok { background: #e6f7ec; color: #064; }
+.msg.err { background: #fde8e8; color: #900; }
+.msg.info { background: #eef4fb; color: #036; }
+table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #eee; }
+th { background: #f4f4f4; }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.tag.succeeded { background: #d4f5dd; color: #064; }
+.tag.running { background: #fff3cd; color: #663; }
+.tag.failed { background: #fdd; color: #900; }
+.tag.pending, .tag.skipped { background: #eee; color: #666; }
+.artifact-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #eee; font-size: 13px; }
+.artifact-row a { color: #036; text-decoration: none; }
+.artifact-row a:hover { text-decoration: underline; }
+#renderWrap img { max-width: 100%; margin-top: 12px; border: 1px solid #ddd; border-radius: 4px; }

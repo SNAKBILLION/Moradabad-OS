@@ -16,12 +16,18 @@ doesn't invalidate stored job records.
 from __future__ import annotations
 
 import hmac
+import io
 import os
 from datetime import datetime
 from uuid import UUID, uuid4
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import APIKeyHeader
+from fastapi import Response
+from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
+from botocore.exceptions import ClientError
+from pathlib import Path as _UIPath
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -409,6 +415,34 @@ def create_app() -> FastAPI:
         except FeedbackNotFoundError as e:
             raise HTTPException(status_code=404, detail=str(e)) from e
         return _feedback_to_response(record)
+
+    @app.get(
+        "/jobs/{job_id}/render/{spec_id}.png",
+    )
+    def get_render_png(
+        job_id: UUID,
+        spec_id: str,
+        key: str | None = None,
+        api_key_hdr: str | None = Depends(api_key_header),
+        store=Depends(get_store),
+    ) -> Response:
+        # Accept key via header OR query param so <img> tags work in the UI.
+        provided = api_key_hdr or key
+        if not provided or not hmac.compare_digest(provided, _API_KEY):
+            raise HTTPException(status_code=401, detail="invalid api key")
+        uri = f"s3://{store.bucket}/jobs/{job_id}/render/{spec_id}.png"
+        try:
+            data = store.get_bytes(uri)
+        except (KeyError, ClientError) as e:
+            raise HTTPException(status_code=404, detail=f"render not found: {e}")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"render fetch failed: {e}")
+        return StreamingResponse(io.BytesIO(data), media_type="image/png")
+
+    _ui_dir = _UIPath(__file__).resolve().parent / "ui"
+    if _ui_dir.is_dir():
+        app.mount("/ui", StaticFiles(directory=str(_ui_dir), html=True), name="ui")
+
 
     return app
 

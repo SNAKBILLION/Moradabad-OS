@@ -127,3 +127,9 @@ curl -X POST http://localhost:8000/jobs \
 1. Factory partner's top-10 SKUs → which 10 templates to build.
 2. Metal rate source (IBJA vs MCX vs mandi).
 3. Source of verified Hindi translations for shop-floor terminology.
+
+## Test UI
+
+After starting the API, open `http://<host>:8000/ui/` in a browser.
+Submit briefs, view job status, inspect artifacts and render image.
+Internal QA only — not for end users.

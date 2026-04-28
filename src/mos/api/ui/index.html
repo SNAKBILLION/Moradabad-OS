@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Moradabad OS — Test Console</title>
+<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+<header>
+  <h1>Moradabad OS — Test Console</h1>
+  <p class="sub">Internal QA UI. Not for buyers.</p>
+</header>
+
+<section class="card">
+  <h2>1. Create job</h2>
+  <label>Company / owner ID
+    <input id="owner_id" value="00000000-0000-0000-0000-000000000001" />
+  </label>
+  <label>API key
+    <input id="api_key" value="moradabad-secret-123" />
+  </label>
+  <label>Brief
+    <textarea id="brief" rows="3">small brass candle holder, 10cm tall, classic shape, satin finish</textarea>
+  </label>
+  <button id="submitBtn">Submit job</button>
+  <div id="submitMsg" class="msg"></div>
+</section>
+
+<section class="card">
+  <h2>2. Job</h2>
+  <label>Job ID
+    <input id="job_id" placeholder="paste or auto-filled after submit" />
+  </label>
+  <button id="refreshBtn">Refresh status</button>
+  <button id="autoBtn">Auto-poll</button>
+  <div id="status" class="msg"></div>
+  <table id="stages"></table>
+</section>
+
+<section class="card">
+  <h2>3. Outputs</h2>
+  <div id="artifacts"></div>
+  <div id="renderWrap"></div>
+</section>
+
+<script src="./app.js"></script>
+</body>
+</html>
